@@ -1,0 +1,45 @@
+[
+    {
+        "id": 1,
+        "name": "IPhone 12",
+        "manufacturer": "Apple",
+        "memorory": "4GB",
+        "ram": "64GB"
+    },
+    {
+        "id": 2,
+        "name": "Pixel 5",
+        "manufacturer": "Google",
+        "memorory": "GB",
+        "ram": "128GB"
+    },
+    {
+        "id": 3,
+        "name": "OnePlus 8",
+        "manufacturer": "OnePlus",
+        "memorory": "8GB",
+        "ram": "128GB"
+    },
+    {
+        "id": 4,
+        "name": "OnePlus 8 Pro",
+        "manufacturer": "OnePlus",
+        "memorory": "12GB",
+        "ram": "256GB"
+    },
+    {
+        "id": 5,
+        "name": "OnePlus 8T",
+        "manufacturer": "OnePlus",
+        "memorory": "8GB",
+        "ram": "128GB"
+    },
+
+    {
+        "id": 6,
+        "name": "IPhone 11",
+        "manufacturer": "Apple",
+        "memorory": "4GB",
+        "ram": "64GB"
+    }
+]

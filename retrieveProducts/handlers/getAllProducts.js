@@ -1,15 +1,17 @@
 import {products} from '../data';
 
-export const handler = async () => {
+const handler = async () => {
   try {
     return {
-      status: 200,
-      body: products
+      statusCode: 200,
+      body: JSON.stringify(products)
     }
   } catch(error) {
     return {
-      status: 500,
+      statusCode: 500,
       body: `Failed to retrive products due to ${JSON.stringify(error)}`
     }
   }
 };
+
+export default handler;

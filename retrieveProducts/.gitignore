@@ -1,9 +1,27 @@
-# package directories
-node_modules
-jspm_packages
-
-# Serverless directories
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+*.log
 .serverless
-
-# Webpack directories
-.webpack
+v8-compile-cache-*
+jest/*
+coverage
+testProjects/*/package-lock.json
+testProjects/*/yarn.lock
+.serverlessUnzipped
+node_modules
+.vscode/
+.eslintcache
+dist
+.idea
+build/
+.env*
+.cache*
+.serverless
+.serverless_nextjs
+.serverless_plugins
+env.js
+tmp
+package-lock.json
+yarn.lock
+test

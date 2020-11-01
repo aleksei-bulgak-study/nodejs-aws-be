@@ -1,7 +1,7 @@
 service:
   name: nodejs-aws-be
 app: products-retrieve-service
-org: aws-node-cource
+org: alekseibulgakstudy
 frameworkVersion: '2'
 
 # Add the serverless-webpack plugin
@@ -11,19 +11,19 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  region: eu-east-1
+  region: eu-west-1
   
 
 functions:
-  first:
+  getAllProducts:
     handler: handler.getAllProducts
     events:
       - http:
           path: products
-          method: post
+          method: get
           cors: true
       
-  second:
+  getProductById:
     handler: handler.getProductById
     events:
       - http:

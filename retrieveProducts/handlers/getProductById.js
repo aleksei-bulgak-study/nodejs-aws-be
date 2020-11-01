@@ -1,6 +1,11 @@
 import {products} from '../data';
 
-const buildResponse = (statusCode, body) => ({statusCode, body: JSON.stringify(body)});
+const cors = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Credentials': true,
+};
+
+const buildResponse = (statusCode, body, headers) => ({statusCode, body: JSON.stringify(body), headers});
 
 const getIdFromRequest = (event) => {
   try {
@@ -25,7 +30,7 @@ const handler = async (event) => {
       throw new Error(JSON.stringify(buildResponse(404, {message:`Failed to retrieve product with id ${id}`})));
     }
 
-    return buildResponse(200, result[0]);
+    return buildResponse(200, result[0], cors);
   }catch(error) {
     return JSON.parse(error.message);
   }

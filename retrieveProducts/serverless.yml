@@ -21,7 +21,16 @@ functions:
       - http:
           path: products
           method: get
-          cors: false
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
       
   getProductById:
     handler: handler.getProductById
@@ -29,7 +38,16 @@ functions:
       - http:
           method: get
           path: products/{id}
-          cors: false
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
           request:
             parameters:
               paths:

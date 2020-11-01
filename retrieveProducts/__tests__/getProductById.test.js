@@ -22,7 +22,7 @@ describe('getProductById', () => {
 
   test('when id was not specified then 404 error returned', async () => {
     products.push({ id: 234, value: 'data' });
-    const response = await getProductById({ pathParameters: { } });
+    const response = await getProductById({ pathParameters: {} });
     expect(response.statusCode).toEqual(400);
     expect(response.body).toEqual(
       JSON.stringify({ message: 'Failed to retrieve id from request' })

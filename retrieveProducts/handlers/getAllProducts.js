@@ -1,16 +1,18 @@
-import {products} from '../data';
+import { products } from '../data';
 
 const handler = async () => {
   try {
     return {
       statusCode: 200,
-      body: JSON.stringify(products)
-    }
-  } catch(error) {
+      body: JSON.stringify(products),
+    };
+  } catch (error) {
     return {
       statusCode: 500,
-      body: `Failed to retrive products due to ${JSON.stringify(error)}`
-    }
+      body: JSON.stringify({
+        message: `Failed to retrive products due to ${JSON.stringify(error)}`,
+      }),
+    };
   }
 };
 

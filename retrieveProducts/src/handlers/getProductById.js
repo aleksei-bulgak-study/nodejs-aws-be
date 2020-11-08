@@ -3,6 +3,7 @@ import { buildResponse } from '../utils';
 
 const getIdFromRequest = (event) => {
   try {
+    console.log(`Incoming request ${JSON.stringify(event)}`);
     const { id } = event.pathParameters;
     if (id) {
       return id;

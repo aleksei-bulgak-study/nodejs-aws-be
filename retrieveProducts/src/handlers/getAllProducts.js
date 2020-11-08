@@ -1,8 +1,9 @@
 import { loadProducts } from '../service';
 import { buildResponse } from '../utils';
 
-const handler = async () => {
+const handler = async (event) => {
   try {
+    console.log(`Incoming request ${JSON.stringify(event)}`);
     const products = await loadProducts();
     return buildResponse(200, products);
   } catch (error) {

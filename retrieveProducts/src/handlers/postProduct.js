@@ -3,6 +3,7 @@ import { buildResponse } from '../utils';
 
 const handler = async ({ body }) => {
   try {
+    console.log(`Incoming request ${body}`);
     const product = await postProduct(JSON.parse(body));
 
     if (!product) {
@@ -11,7 +12,8 @@ const handler = async ({ body }) => {
 
     return buildResponse(201, product);
   } catch (error) {
-    return buildResponse(500, { message: error.message });
+    const errorCode = error.type === 'bad-request' ? 400 : 500;
+    return buildResponse(errorCode, { message: error.message });
   }
 };
 

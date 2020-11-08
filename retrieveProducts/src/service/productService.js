@@ -30,14 +30,44 @@ export const loadProductById = async (id) => {
 };
 
 export const postProduct = async (body) => {
+  validateProduct(body);
   try {
-    return await createProduct({
+    const product = {
       title: body.title,
       description: body.description,
       price: body.price,
       img: body.img,
-    });
+    };
+    return await createProduct();
   } catch (err) {
     throw new Error(err.message);
+  }
+};
+
+const validateProduct = (product) => {
+  if(!product) {
+    const error = new Error('Invalid product json was provided');
+    error.type = 'bad-request';
+    throw error;
+  }
+  if(!product.title) {
+    const error = new Error('Invalid title was provided');
+    error.type = 'bad-request';
+    throw error;
+  }
+  if(!product.description) {
+    const error = new Error('Invalid description was provided');
+    error.type = 'bad-request';
+    throw error;
+  }
+  if(!product.price || product.price < 0) {
+    const error = new Error('Invalid price was provided');
+    error.status = 400;
+    throw error;
+  }
+  if(!product.img) {
+    const error = new Error('Invalid img was provided');
+    error.type = 'bad-request';
+    throw error;
   }
 };

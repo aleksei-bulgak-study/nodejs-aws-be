@@ -10,7 +10,7 @@ CREATE TABLE product (
 
 
 CREATE TABLE store ( 
-	product_id uuid DEFAULT uuid_generate_v4() NOT NULL,
+	product_id uuid NOT NULL,
 	count INTEGER DEFAULT 0 NOT NULL,
 	CONSTRAINT pk_store PRIMARY KEY(product_id),
 	CONSTRAINT fk_product FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE

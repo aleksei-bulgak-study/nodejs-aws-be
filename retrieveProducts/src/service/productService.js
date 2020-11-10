@@ -38,7 +38,7 @@ export const postProduct = async (body) => {
       price: body.price,
       img: body.img,
     };
-    return await createProduct();
+    return await createProduct(product);
   } catch (err) {
     throw new Error(err.message);
   }

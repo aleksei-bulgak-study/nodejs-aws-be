@@ -62,7 +62,7 @@ const validateProduct = (product) => {
   }
   if(!product.price || product.price < 0) {
     const error = new Error('Invalid price was provided');
-    error.status = 400;
+    error.status = 'bad-request';
     throw error;
   }
   if(!product.img) {

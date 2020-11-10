@@ -1,5 +1,5 @@
 import { getAllProducts, getProductById, createProduct } from '../repository/productsRepository';
-import { getStores } from '../repository/storeRepository';
+import { createStore } from '../repository/storeRepository';
 
 export const loadProducts = async () => {
   try {
@@ -35,8 +35,12 @@ export const postProduct = async (body) => {
       description: body.description,
       price: body.price,
       img: body.img,
+      count: body.count || 0,
     };
-    return await createProduct(product);
+    const newProduct = await createProduct(product);
+    newProduct.count = product.count;
+    await createStore(newProduct.id, newProduct.count);
+    return newProduct;
   } catch (err) {
     throw new Error(err.message);
   }
@@ -65,6 +69,11 @@ const validateProduct = (product) => {
   }
   if(!product.img) {
     const error = new Error('Invalid img was provided');
+    error.type = 'bad-request';
+    throw error;
+  }
+  if(product.count && isNaN(+product.count)) {
+    const error = new Error('Invalid count value was provided. Please use numeric values');
     error.type = 'bad-request';
     throw error;
   }

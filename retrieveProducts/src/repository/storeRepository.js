@@ -26,3 +26,16 @@ export const getStores = async () => {
     client.end();
   }
 };
+
+export const createStore = async (id, count = 0) => {
+  const client = new Client(dbOptions);
+  await client.connect();
+
+  try {
+    await client.query('INSERT INTO store(product_id, count) VALUES($1, $2)', [id, count]);
+  } catch (err) {
+    throw new Error(`Failed to create store record for  due to error ${err.message}`);
+  } finally {
+    client.end();
+  }
+};

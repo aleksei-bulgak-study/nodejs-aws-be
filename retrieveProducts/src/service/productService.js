@@ -3,11 +3,10 @@ import { getStores } from '../repository/storeRepository';
 
 export const loadProducts = async () => {
   try {
-    const [products, stores] = await Promise.all([getAllProducts(), getStores()]);
+    const products = await getAllProducts();
     products.forEach((product) => {
-      const productStore = stores.find((store) => store.product_id === product.id);
-      if (productStore) {
-        product.count = productStore.count;
+      if (!product.count) {
+        product.count = 0;
       }
     });
     return products;
@@ -18,10 +17,9 @@ export const loadProducts = async () => {
 
 export const loadProductById = async (id) => {
   try {
-    const [product, stores] = await Promise.all([getProductById(id), getStores()]);
-    const store = stores.find((store) => store.product_id === product.id);
-    if (store) {
-      product.count = store.count;
+    const product = await getProductById(id);
+    if (!product.count) {
+      product.count = 0;
     }
     return product;
   } catch (err) {

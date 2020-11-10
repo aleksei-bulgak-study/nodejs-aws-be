@@ -18,12 +18,14 @@ export const getAllProducts = async () => {
   await client.connect();
 
   try {
-    const { rows: products } = await client.query('SELECT p.id, p.title, p.description, p.price, p.img, s.count FROM product p LEFT JOIN store s ON p.id = s.product_id');
+    const { rows: products } = await client.query(
+      'SELECT p.id, p.title, p.description, p.price, p.img, s.count FROM product p LEFT JOIN store s ON p.id = s.product_id'
+    );
     return products;
   } catch (err) {
     throw new Error(`Failed to get products due to error ${err.message}`);
   } finally {
-    client.end();
+    await client.end();
   }
 };
 
@@ -32,18 +34,27 @@ export const getProductById = async (id) => {
   await client.connect();
 
   try {
-    const { rows: product } = await client.query('SELECT p.id, p.title, p.description, p.price, p.img, s.count FROM product p LEFT JOIN store s ON p.id = s.product_id WHERE p.id = $1', [id]);
+    const {
+      rows: product,
+    } = await client.query(
+      'SELECT p.id, p.title, p.description, p.price, p.img, s.count FROM product p LEFT JOIN store s ON p.id = s.product_id WHERE p.id = $1',
+      [id]
+    );
     return product[0];
   } catch (err) {
     throw new Error(`Failed to get product by id ${id}`);
   } finally {
-    client.end();
+    await client.end();
   }
 };
 
-export const createProduct = async (product) => {
-  const client = new Client(dbOptions);
-  await client.connect();
+export const createProduct = async (product, externalClient) => {
+  let client = externalClient;
+  if (!client) {
+    client = new Client(dbOptions);
+    await client.connect();
+  }
+
   try {
     const {
       rows: results,
@@ -55,6 +66,8 @@ export const createProduct = async (product) => {
   } catch (err) {
     throw new Error(`Failed to create product ${product}`);
   } finally {
-    client.end();
+    if (!externalClient) {
+      await client.end();
+    }
   }
 };

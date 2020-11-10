@@ -23,19 +23,24 @@ export const getStores = async () => {
   } catch (err) {
     throw new Error(`Failed to get stores due to error ${err.message}`);
   } finally {
-    client.end();
+    await client.end();
   }
 };
 
-export const createStore = async (id, count = 0) => {
-  const client = new Client(dbOptions);
-  await client.connect();
+export const createStore = async (id, count = 0, externalClient) => {
+  let client = externalClient;
+  if (!client) {
+    client = new Client(dbOptions);
+    await client.connect();
+  }
 
   try {
     await client.query('INSERT INTO store(product_id, count) VALUES($1, $2)', [id, count]);
   } catch (err) {
     throw new Error(`Failed to create store record for  due to error ${err.message}`);
   } finally {
-    client.end();
+    if (!externalClient) {
+      await client.end();
+    }
   }
 };

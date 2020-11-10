@@ -1,5 +1,6 @@
 import { getAllProducts, getProductById, createProduct } from '../repository/productsRepository';
 import { createStore } from '../repository/storeRepository';
+import {withTransaction} from '../repository/transactional';
 
 export const loadProducts = async () => {
   try {
@@ -37,9 +38,13 @@ export const postProduct = async (body) => {
       img: body.img,
       count: body.count || 0,
     };
-    const newProduct = await createProduct(product);
-    newProduct.count = product.count;
-    await createStore(newProduct.id, newProduct.count);
+
+    let newProduct = null;
+    await withTransaction(async (client) => {
+      newProduct = await createProduct(product, client);
+      newProduct.count = product.count;
+      await createStore(newProduct.id, newProduct.count, client);
+    });
     return newProduct;
   } catch (err) {
     throw new Error(err.message);

@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 
 const s3 = new AWS.S3();
-AWS.config.update({ region: 'ue-west-1' });
+AWS.config.update({ region: 'eu-west-1' });
 
 const importBucketName = process.env.IMPORT_BUCKET_NAME;
 const defaultExpiration = process.env.SIGNED_URL_EXPIRATION;

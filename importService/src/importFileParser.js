@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import csv from 'csv-parser';
 
 const s3 = new AWS.S3();
-AWS.config.update({ region: 'ue-west-1' });
+AWS.config.update({ region: 'eu-west-1' });
 
 const filePrefix = process.env.IMPORT_FILE_PREFIX;
 const copyPrefix = process.env.COPY_PREFIX;
@@ -39,14 +39,12 @@ const deleteObject = async (bucket, key) => {
 };
 
 const handler = async (event) => {
-  return await event.Records.forEach(async (record) => {
+  for (const record of event.Records) {
     console.log(record.s3.bucket.name, record.s3.object.key);
     const bucket = record.s3.bucket.name;
     const fileName = record.s3.object.key;
-
-    const stream = s3.getObject({ Bucket: bucket, Key: fileName }).createReadStream();
     await new Promise((resolve, reject) => {
-      console.log(stream);
+      const stream = s3.getObject({ Bucket: bucket, Key: fileName }).createReadStream();
       stream
         .pipe(csv())
         .on('data', (data) => console.log('New record', data))
@@ -55,8 +53,8 @@ const handler = async (event) => {
     })
       .then(() => copyFileToProcessedFolder(bucket, fileName))
       .then(() => deleteObject(bucket, fileName))
-      .catch((e) => console.log('error during file processing', e));
-  });
+      .catch((e) => console.log('Failed to process file due to error', e));
+  }
 };
 
 export default handler;

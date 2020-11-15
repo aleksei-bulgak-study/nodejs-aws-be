@@ -5,6 +5,7 @@ AWS.config.update({ region: 'ue-west-1' });
 
 const importBucketName = process.env.IMPORT_BUCKET_NAME;
 const defaultExpiration = process.env.SIGNED_URL_EXPIRATION;
+const filePrefix = process.env.IMPORT_FILE_PREFIX;
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -29,7 +30,7 @@ const handler = async (event) => {
   try {
     const params = {
       Bucket: importBucketName,
-      Key: `uploaded/${name}`,
+      Key: `${filePrefix}${name}`,
       Expires: +defaultExpiration,
       ContentType: 'text/csv'
     };

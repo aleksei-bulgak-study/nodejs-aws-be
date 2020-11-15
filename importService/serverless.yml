@@ -12,6 +12,8 @@ provider:
   environment:
     IMPORT_BUCKET_NAME: ${env:IMPORT_BUCKET_NAME}
     SIGNED_URL_EXPIRATION: 60
+    COPY_PREFIX: processed/
+    IMPORT_FILE_PREFIX: uploaded/
   
   iamRoleStatements:
     - Effect: "Allow"
@@ -48,3 +50,14 @@ functions:
             parameters:
               querystrings:
                 name: true
+
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: ${env:IMPORT_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ${env:IMPORT_FILE_PREFIX}
+            - suffix: .csv
+          existing: true 

@@ -1,0 +1,63 @@
+service: importservice
+app: importservice
+org: alekseibulgakstudy
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    IMPORT_BUCKET_NAME: ${env:IMPORT_BUCKET_NAME}
+    SIGNED_URL_EXPIRATION: 60
+    COPY_PREFIX: processed/
+    IMPORT_FILE_PREFIX: uploaded/
+  
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "s3:ListBucket"
+      Resource:
+        - "arn:aws:s3:::${env:IMPORT_BUCKET_NAME}"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        - "arn:aws:s3:::${env:IMPORT_BUCKET_NAME}/*"
+
+custom:
+  dotenv:
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+
+
+plugins:
+  - serverless-plugin-webpack
+  - serverless-iam-roles-per-function 
+  - serverless-dotenv-plugin
+
+functions:
+  importProductsFile:
+    handler: handler.importServiceFile
+    events:
+      - http:
+          method: get
+          path: import
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
+
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: ${env:IMPORT_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ${env:IMPORT_FILE_PREFIX}
+            - suffix: .csv
+          existing: true 

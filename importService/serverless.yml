@@ -8,12 +8,21 @@ provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: eu-west-1
+  region: ${opt:region, self:custom.region}
   environment:
     IMPORT_BUCKET_NAME: ${env:IMPORT_BUCKET_NAME}
     SIGNED_URL_EXPIRATION: 60
     COPY_PREFIX: processed/
     IMPORT_FILE_PREFIX: uploaded/
+    REGION: ${opt:region, self:custom.region}
+
+    DB_URL: ${env:DB_URL}
+    DB_PORT: ${env:DB_PORT}
+    DB_USERNAME: ${env:DB_USERNAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+
+    SQS_TOPIC: catalogItemsQueue
+    SNS_TOPIC: !Ref createProductTopic
   
   iamRoleStatements:
     - Effect: "Allow"
@@ -25,8 +34,21 @@ provider:
         - "s3:*"
       Resource:
         - "arn:aws:s3:::${env:IMPORT_BUCKET_NAME}/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: 
+        - Fn::GetAtt:
+            - catalogItemsQueue
+            - Arn
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource: 
+        - !Ref createProductTopic
 
 custom:
+  region: eu-west-1
   dotenv:
     exclude:
       - AWS_ACCESS_KEY_ID
@@ -60,4 +82,48 @@ functions:
           rules:
             - prefix: ${env:IMPORT_FILE_PREFIX}
             - suffix: .csv
-          existing: true 
+          existing: true
+
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - catalogItemsQueue
+              - Arn
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    createProductTopicSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        Endpoint: aleksei.bulgak@gmail.com
+        TopicArn : !Ref 'createProductTopic'
+        FilterPolicy:
+          owner:
+            - manager
+    createProductTopicSubscription2:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        Endpoint: bulgak.aleksei@yandex.ru
+        TopicArn : !Ref 'createProductTopic'
+        FilterPolicy:
+          owner:
+            - developer
+  Outputs:
+    createProductTopic:
+      Value: !Ref createProductTopic
+      Export:
+        Name: createProductTopic

@@ -4,7 +4,7 @@ import snsService from './service/sns';
 const handler = async (event) => {
   for (const record of event.Records) {
     const { body } = record;
-    await postProduct(JSON.parse(body)).then((data) => {
+    await postProduct(JSON.parse(body)).then((id) => {
       let owner = 'developer';
       if (JSON.parse(body).count > 2) {
         owner = 'manager';

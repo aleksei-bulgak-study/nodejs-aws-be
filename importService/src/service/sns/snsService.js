@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 
-const region = 'test';
-const snsTopicUrl = 'test';
+const region = process.env.REGION;
+const snsTopicUrl = process.env.SNS_TOPIC;
 
 AWS.config.update({ region });
 const sns = new AWS.SNS({ apiVersion: '2010-03-31' });

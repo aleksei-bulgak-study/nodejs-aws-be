@@ -1,6 +1,8 @@
 import AwsSdkMock from 'aws-sdk-mock';
 
 const wrapper = async (data, owner) => {
+  process.env.REGION = 'test';
+  process.env.SNS_TOPIC = 'test';
   const snsService = await (await import('../../../src/service/sns')).default;
   return await snsService(data, owner);
 };
@@ -36,10 +38,10 @@ describe('sns', () => {
     const owner = 'developer';
 
     try {
-        await wrapper(dataToPost, owner);
-        expect(false).toEqual(true);
-    } catch(err) {
-        expect(err.message).toEqual("Missing required key 'Message' in params");
+      await wrapper(dataToPost, owner);
+      expect(false).toEqual(true);
+    } catch (err) {
+      expect(err.message).toEqual("Missing required key 'Message' in params");
     }
   });
 });

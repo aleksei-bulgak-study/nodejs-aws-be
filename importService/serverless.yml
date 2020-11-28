@@ -16,13 +16,8 @@ provider:
     IMPORT_FILE_PREFIX: uploaded/
     REGION: ${opt:region, self:custom.region}
 
-    DB_URL: ${env:DB_URL}
-    DB_PORT: ${env:DB_PORT}
-    DB_USERNAME: ${env:DB_USERNAME}
-    DB_PASSWORD: ${env:DB_PASSWORD}
-
     SQS_TOPIC: catalogItemsQueue
-    SNS_TOPIC: !Ref createProductTopic
+    SNS_TOPIC: ${cf:nodejs-aws-be-dev.createProductTopic}
   
   iamRoleStatements:
     - Effect: "Allow"
@@ -38,14 +33,12 @@ provider:
       Action:
         - "sqs:*"
       Resource: 
-        - Fn::GetAtt:
-            - catalogItemsQueue
-            - Arn
+        - ${cf:nodejs-aws-be-dev.catalogItemsQueue}
     - Effect: "Allow"
       Action:
         - "sns:*"
       Resource: 
-        - !Ref createProductTopic
+        - ${cf:nodejs-aws-be-dev.createProductTopic}
 
 custom:
   region: eu-west-1
@@ -83,47 +76,3 @@ functions:
             - prefix: ${env:IMPORT_FILE_PREFIX}
             - suffix: .csv
           existing: true
-
-  catalogBatchProcess:
-    handler: handler.catalogBatchProcess
-    events:
-      - sqs:
-          batchSize: 5
-          arn:
-            Fn::GetAtt:
-              - catalogItemsQueue
-              - Arn
-
-resources:
-  Resources:
-    catalogItemsQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueue
-    createProductTopic:
-      Type: AWS::SNS::Topic
-      Properties:
-        TopicName: createProductTopic
-    createProductTopicSubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Protocol: email
-        Endpoint: aleksei.bulgak@gmail.com
-        TopicArn : !Ref 'createProductTopic'
-        FilterPolicy:
-          owner:
-            - manager
-    createProductTopicSubscription2:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Protocol: email
-        Endpoint: bulgak.aleksei@yandex.ru
-        TopicArn : !Ref 'createProductTopic'
-        FilterPolicy:
-          owner:
-            - developer
-  Outputs:
-    createProductTopic:
-      Value: !Ref createProductTopic
-      Export:
-        Name: createProductTopic

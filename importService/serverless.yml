@@ -8,12 +8,16 @@ provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: eu-west-1
+  region: ${opt:region, self:custom.region}
   environment:
     IMPORT_BUCKET_NAME: ${env:IMPORT_BUCKET_NAME}
     SIGNED_URL_EXPIRATION: 60
     COPY_PREFIX: processed/
     IMPORT_FILE_PREFIX: uploaded/
+    REGION: ${opt:region, self:custom.region}
+
+    SQS_TOPIC: catalogItemsQueue
+    SNS_TOPIC: ${cf:nodejs-aws-be-dev.createProductTopic}
   
   iamRoleStatements:
     - Effect: "Allow"
@@ -25,8 +29,19 @@ provider:
         - "s3:*"
       Resource:
         - "arn:aws:s3:::${env:IMPORT_BUCKET_NAME}/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: 
+        - ${cf:nodejs-aws-be-dev.catalogItemsQueue}
+    - Effect: "Allow"
+      Action:
+        - "sns:*"
+      Resource: 
+        - ${cf:nodejs-aws-be-dev.createProductTopic}
 
 custom:
+  region: eu-west-1
   dotenv:
     exclude:
       - AWS_ACCESS_KEY_ID
@@ -60,4 +75,4 @@ functions:
           rules:
             - prefix: ${env:IMPORT_FILE_PREFIX}
             - suffix: .csv
-          existing: true 
+          existing: true

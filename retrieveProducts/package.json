@@ -29,6 +29,7 @@
     "webpack-cli": "^4.1.0"
   },
   "dependencies": {
+    "aws-sdk": "^2.799.0",
     "pg": "^8.4.2"
   }
 }

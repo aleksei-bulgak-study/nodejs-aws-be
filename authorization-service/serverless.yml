@@ -27,3 +27,11 @@ plugins:
 functions:
   basicAuthorizer:
     handler: handler.basicAuthorizer
+
+resources:
+  Outputs:
+    basicAuthorizerArn:
+      Value: 
+        Fn::GetAtt:
+          - BasicAuthorizerLambdaFunction
+          - Arn

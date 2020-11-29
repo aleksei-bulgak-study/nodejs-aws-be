@@ -1,0 +1,41 @@
+---
+swagger: "2.0"
+info:
+  version: "2020-11-29T08:37:15Z"
+  title: "dev-importservice"
+host: "hsxp3p0ow9.execute-api.eu-west-1.amazonaws.com"
+basePath: "/dev"
+schemes:
+- "https"
+paths:
+  /import:
+    get:
+      parameters:
+      - name: "name"
+        in: "query"
+        required: true
+        type: "string"
+      responses: {}
+      security:
+      - 5: []
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+securityDefinitions:
+  5:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    x-amazon-apigateway-authtype: "custom"

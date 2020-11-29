@@ -46,7 +46,7 @@ const handler = (event, _, callback) => {
     console.log('User with specified credentials does not have access to service');
     return callback(null, generatePolicy(user, 'Deny', event.methodArn));
   } catch (err) {
-    console.log('Error was thrown during authorization process', e);
+    console.log('Error was thrown during authorization process', err);
     callback('Unauthorized');
   }
 };

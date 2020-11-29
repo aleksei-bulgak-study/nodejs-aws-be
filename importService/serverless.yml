@@ -65,6 +65,10 @@ functions:
             parameters:
               querystrings:
                 name: true
+          response:
+            headers:
+              Access-Control-Allow-Origin: '*'
+              Access-Control-Allow-Credentials: true
           authorizer:
             arn: ${cf:authorization-service-dev.BasicAuthorizerLambdaFunctionQualifiedArn}
             resultTtlInSeconds: 0
@@ -81,3 +85,15 @@ functions:
             - prefix: ${env:IMPORT_FILE_PREFIX}
             - suffix: .csv
           existing: true
+
+resources:
+  Resources:
+    GatewayResponse4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'

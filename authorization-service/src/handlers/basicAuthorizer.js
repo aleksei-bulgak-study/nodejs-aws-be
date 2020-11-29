@@ -17,7 +17,11 @@ const generatePolicy = (principalId = 'anonymous', effect = 'Deny', resource) =>
 const tokenDecoder = (token) => {
   const encodedString = token.split(' ')[1];
   const buff = Buffer.from(encodedString, 'base64');
-  return buff.toString('ascii').split("=");
+  const credentials = buff.toString('ascii').split("=");
+  if(!credentials || credentials.length !== 2 || !credentials[0] || !credentials[1]) {
+    throw new Error('failed to decode token');
+  }
+  return credentials;
 };
 
 const handler = (event, _, callback) => {
@@ -43,7 +47,7 @@ const handler = (event, _, callback) => {
     return callback(null, generatePolicy(user, 'Deny', event.methodArn));
   } catch (err) {
     console.log('Error was thrown during authorization process', e);
-    callback(err);
+    callback('Unauthorized');
   }
 };
 

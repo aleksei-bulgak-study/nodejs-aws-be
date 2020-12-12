@@ -1,6 +1,9 @@
 import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import NodeCache from 'node-cache';
+
+const responseCache = new NodeCache();
 
 dotenv.config();
 
@@ -13,10 +16,32 @@ const getUrlByServiceName = (serviceName) => {
 };
 
 const getRequestBody = (req) => {
-  if(['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
     return req.body;
   }
   return;
+};
+
+const isCacheNeeded = (req) => req.originalUrl.startsWith('/products') && req.method === 'GET';
+
+const cacheMiddleware = (req, res, next) => {
+  if (isCacheNeeded(req)) {
+    const value = responseCache.get(req.originalUrl);
+    if (value) {
+      console.log('from cache')
+      res.set(value.headers).status(value.status).send(value.data);
+      return;
+    }
+  }
+  next();
+};
+
+const cacheResponseMiddleware = (req, res, next) => {
+  if (res.internalResponse && isCacheNeeded(req)) {
+    const { status, headers, data } = res.internalResponse;
+    responseCache.set(req.originalUrl, { status, headers, data }, 120);
+  }
+  next();
 };
 
 const port = process.env.PORT || '3000';
@@ -24,6 +49,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cacheMiddleware);
 
 app.all('/:service*', (req, res, next) => {
   try {
@@ -32,8 +58,6 @@ app.all('/:service*', (req, res, next) => {
     const fullUrl = req.originalUrl;
     const resultUrl = serviceUrl + fullUrl.replace(`\/${serviceName}`, '');
 
-    console.log(resultUrl);
-
     axios({
       method: req.method,
       url: resultUrl,
@@ -41,20 +65,33 @@ app.all('/:service*', (req, res, next) => {
       headers: { ...req.headers, host: 'kutdlurimk.execute-api.eu-west-1.amazonaws.com' },
     })
       .then((response) => {
-        console.log('response');
-        res.status(response.status).set(response.headers).send(response.data);
+        res.internalResponse = response;
+        next();
       })
       .catch((err) => {
-        console.log(err);
-        res.status(err.response.status).set(err.response.headers).send(err.response.data);
+        next(err);
       });
   } catch (err) {
-    next();
+    next(err);
   }
 });
+app.use(cacheResponseMiddleware);
+app.use((req, res, next) => {
+  if(res.internalResponse) {
+    const response = res.internalResponse;
+    res.set(response.headers).status(response.status).send(response.data);
+    return;
+  }
+  next();
+});
 
-app.use((req, res) => {
-  res.status(502).json({ message: 'Cannot process request' });
+app.use((err, req, res, next) => {
+  if (err.response) {
+    res.set(err.response.headers).status(err.response.status).send(err.response.data);
+  } else {
+    console.log(err);
+    res.status(502).json({ message: 'Cannot process request' });
+  }
 });
 
 const server = app.listen(port, () =>

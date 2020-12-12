@@ -42,11 +42,11 @@ app.all('/:service*', (req, res, next) => {
     })
       .then((response) => {
         console.log('response');
-        res.status(response.status).send(response.data);
+        res.status(response.status).set(response.headers).send(response.data);
       })
       .catch((err) => {
         console.log(err);
-        res.status(err.response.status).send(err.response.data);
+        res.status(err.response.status).set(err.response.headers).send(err.response.data);
       });
   } catch (err) {
     next();

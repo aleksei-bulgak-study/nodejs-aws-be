@@ -62,7 +62,7 @@ app.all('/:service*', (req, res, next) => {
       method: req.method,
       url: resultUrl,
       data: getRequestBody(req.body),
-      headers: { ...req.headers, host: 'kutdlurimk.execute-api.eu-west-1.amazonaws.com' },
+      headers: { ...req.headers, host: '' },
     })
       .then((response) => {
         res.internalResponse = response;
@@ -82,7 +82,7 @@ app.use((req, res, next) => {
     res.set(response.headers).status(response.status).send(response.data);
     return;
   }
-  next();
+  next(new Error('unknown path. return 502 status code'));
 });
 
 app.use((err, req, res, next) => {

@@ -3,9 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "npm run build && node dist/index.js",
     "build": "babel ./index.js --out-dir dist",
-    "dev": "nodemon --exec babel-node index.js"
+    "dev": "nodemon --exec babel-node index.js",
+    "env:terminate": "eb terminate",
+    "env:create": "eb create proxy -v -r eu-west-1 -c aleksei-bulgak-study-bff-api --single",
+    "env:init": "eb init aleksei-bulgak-study-bff-api --platform node.js --region eu-west-1 -v",
+    "env:deploy": "eb deploy"
   },
   "dependencies": {
     "@babel/cli": "^7.12.10",
